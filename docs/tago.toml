@@ -1,0 +1,10 @@
+title       = "lw"
+baseURL     = "https://lesswrong-cli.tamnd.com/"
+description = "Browse LessWrong rationalist community posts"
+contentDir  = "content"
+outputDir   = "public"
+theme       = "tago-doks"
+syntaxHighlight = "true"
+
+[params]
+github = "https://github.com/tamnd/lesswrong-cli"
