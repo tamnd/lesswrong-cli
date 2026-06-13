@@ -27,8 +27,8 @@ type lwPost struct {
 	URL          string  `json:"url"`
 	PageURL      string  `json:"pageUrl"`
 	PostedAt     string  `json:"postedAt"`
-	Score        int     `json:"score"`
-	BaseScore    int     `json:"baseScore"`
+	Score        float64 `json:"score"`
+	BaseScore    float64 `json:"baseScore"`
 	CommentCount int     `json:"commentCount"`
 	WordCount    int     `json:"wordCount"`
 	VoteCount    int     `json:"voteCount"`
@@ -95,7 +95,7 @@ func wireToPost(p lwPost, rank int) Post {
 		Rank:     rank,
 		Title:    p.Title,
 		Author:   author,
-		Score:    p.Score,
+		Score:    int(p.Score),
 		Comments: p.CommentCount,
 		Words:    p.WordCount,
 		Tags:     tags,
