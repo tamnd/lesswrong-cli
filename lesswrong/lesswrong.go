@@ -171,6 +171,19 @@ func searchQuery(q string, limit int) string {
 }`, limit, q)
 }
 
+func tagPostsQuery(tagID string, limit int) string {
+	return fmt.Sprintf(`{
+  posts(input: {terms: {limit: %d, filterSettings: {tags: [{tagId: %q, filterMode: "Required"}]}}}) {
+    results {
+      _id title pageUrl postedAt score baseScore commentCount wordCount
+      voteCount
+      user { username displayName }
+      tags { name }
+    }
+  }
+}`, limit, tagID)
+}
+
 func singlePostQuery(id string) string {
 	return fmt.Sprintf(`{
   post(input: {selector: {_id: %q}}) {
@@ -218,6 +231,27 @@ func (c *Client) Search(ctx context.Context, query string, limit int) ([]Post, e
 	var resp postsResponse
 	if err := json.Unmarshal(raw, &resp); err != nil {
 		return nil, fmt.Errorf("decode search: %w", err)
+	}
+	if len(resp.Errors) > 0 {
+		return nil, fmt.Errorf("graphql error: %s", resp.Errors[0].Message)
+	}
+	out := make([]Post, 0, len(resp.Data.Posts.Results))
+	for i, p := range resp.Data.Posts.Results {
+		out = append(out, wireToPost(p, i+1))
+	}
+	return out, nil
+}
+
+// TagPosts fetches posts filtered by a tag ID or slug.
+func (c *Client) TagPosts(ctx context.Context, tagID string, limit int) ([]Post, error) {
+	q := tagPostsQuery(tagID, limit)
+	raw, err := c.graphql(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	var resp postsResponse
+	if err := json.Unmarshal(raw, &resp); err != nil {
+		return nil, fmt.Errorf("decode tag posts: %w", err)
 	}
 	if len(resp.Errors) > 0 {
 		return nil, fmt.Errorf("graphql error: %s", resp.Errors[0].Message)
