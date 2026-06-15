@@ -16,7 +16,7 @@ type Post struct {
 	Words    int    `json:"words"`
 	Tags     string `json:"tags"`
 	Posted   string `json:"posted"`
-	URL      string `json:"url"`
+	URL      string `json:"url"      kit:"id" table:"url,url"`
 }
 
 // ─── GraphQL wire types ───────────────────────────────────────────────────────
